@@ -1,0 +1,153 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predict Big Mart Sales</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+    </style>
+</head>
+<body class="min-h-screen p-4 sm:p-8">
+    <div class="max-w-4xl mx-auto bg-white p-6 sm:p-10 rounded-xl shadow-2xl">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Sales Prediction Input</h1>
+        
+        <!-- Display Prediction Results if available -->
+        {% if results %}
+        <div class="mb-8 p-4 sm:p-6 bg-green-100 border-l-4 border-green-500 rounded-lg text-center">
+            <p class="text-xl font-semibold text-green-800">{{ results }}</p>
+        </div>
+        {% endif %}
+
+        <form action="/predictdata" method="POST" class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
+
+            <!-- Item_Identifier (String for Imputation) -->
+            <div class="col-span-full">
+                <label for="Item_Identifier" class="block text-sm font-medium text-gray-700">Item Identifier (e.g., FDA15)</label>
+                <input type="text" id="Item_Identifier" name="Item_Identifier" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" placeholder="e.g., FDA15, DRC01" required>
+            </div>
+
+            <!-- Item_Weight (Float) -->
+            <div>
+                <label for="Item_Weight" class="block text-sm font-medium text-gray-700">Item Weight (kg)</label>
+                <input type="number" step="any" id="Item_Weight" name="Item_Weight" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" placeholder="e.g., 9.300 (can be left blank for imputation)">
+            </div>
+
+            <!-- Item_MRP (Float) -->
+            <div>
+                <label for="Item_MRP" class="block text-sm font-medium text-gray-700">Item MRP ($)</label>
+                <input type="number" step="any" id="Item_MRP" name="Item_MRP" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" placeholder="e.g., 249.8092" required>
+            </div>
+
+            <!-- Item_Visibility (Float) -->
+            <div>
+                <label for="Item_Visibility" class="block text-sm font-medium text-gray-700">Item Visibility (0 to 1)</label>
+                <input type="number" step="any" id="Item_Visibility" name="Item_Visibility" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" placeholder="e.g., 0.0160473" required>
+            </div>
+
+            <!-- Outlet_Establishment_Year (Int) -->
+            <div>
+                <label for="Outlet_Establishment_Year" class="block text-sm font-medium text-gray-700">Outlet Establishment Year</label>
+                <input type="number" id="Outlet_Establishment_Year" name="Outlet_Establishment_Year" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" placeholder="e.g., 1999" required>
+            </div>
+
+            <!-- Item_Type (Categorical) -->
+            <div>
+                <label for="Item_Type" class="block text-sm font-medium text-gray-700">Item Type</label>
+                <select id="Item_Type" name="Item_Type" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" required>
+                    <option value="" disabled selected>Select Item Type</option>
+                    <option value="Fruits and Vegetables">Fruits and Vegetables</option>
+                    <option value="Snack Foods">Snack Foods</option>
+                    <option value="Household">Household</option>
+                    <option value="Frozen Foods">Frozen Foods</option>
+                    <option value="Dairy">Dairy</option>
+                    <option value="Canned">Canned</option>
+                    <option value="Baking Goods">Baking Goods</option>
+                    <option value="Health and Hygiene">Health and Hygiene</option>
+                    <option value="Soft Drinks">Soft Drinks</option>
+                    <option value="Meat">Meat</option>
+                    <option value="Breads">Breads</option>
+                    <option value="Others">Others</option>
+                    <option value="Hard Drinks">Hard Drinks</option>
+                    <option value="Starchy Foods">Starchy Foods</option>
+                    <option value="Breakfast">Breakfast</option>
+                    <option value="Seafood">Seafood</option>
+                </select>
+            </div>
+
+            <!-- Item_Fat_Content (Categorical) -->
+            <div>
+                <label for="Item_Fat_Content" class="block text-sm font-medium text-gray-700">Item Fat Content</label>
+                <select id="Item_Fat_Content" name="Item_Fat_Content" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" required>
+                    <option value="" disabled selected>Select Fat Content</option>
+                    <option value="Low Fat">Low Fat</option>
+                    <option value="Regular">Regular</option>
+                    <option value="low fat">low fat</option>
+                    <option value="reg">reg</option>
+                    <option value="LF">LF</option>
+                </select>
+            </div>
+
+            <!-- Outlet_Identifier (Categorical) -->
+            <div>
+                <label for="Outlet_Identifier" class="block text-sm font-medium text-gray-700">Outlet Identifier</label>
+                <select id="Outlet_Identifier" name="Outlet_Identifier" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" required>
+                    <option value="" disabled selected>Select Outlet ID</option>
+                    <option value="OUT010">OUT010</option>
+                    <option value="OUT013">OUT013</option>
+                    <option value="OUT017">OUT017</option>
+                    <option value="OUT018">OUT018</option>
+                    <option value="OUT019">OUT019</option>
+                    <option value="OUT027">OUT027</option>
+                    <option value="OUT035">OUT035</option>
+                    <option value="OUT045">OUT045</option>
+                    <option value="OUT046">OUT046</option>
+                    <option value="OUT049">OUT049</option>
+                </select>
+            </div>
+
+            <!-- Outlet_Size (Categorical) -->
+            <div>
+                <label for="Outlet_Size" class="block text-sm font-medium text-gray-700">Outlet Size</label>
+                <select id="Outlet_Size" name="Outlet_Size" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border">
+                    <option value="" selected>Select Outlet Size (can be left blank)</option>
+                    <option value="Small">Small</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                </select>
+            </div>
+            
+            <!-- Outlet_Location_Type (Categorical) -->
+            <div>
+                <label for="Outlet_Location_Type" class="block text-sm font-medium text-gray-700">Outlet Location Type</label>
+                <select id="Outlet_Location_Type" name="Outlet_Location_Type" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" required>
+                    <option value="" disabled selected>Select Location Type</option>
+                    <option value="Tier 1">Tier 1</option>
+                    <option value="Tier 2">Tier 2</option>
+                    <option value="Tier 3">Tier 3</option>
+                </select>
+            </div>
+
+            <!-- Outlet_Type (Categorical) -->
+            <div>
+                <label for="Outlet_Type" class="block text-sm font-medium text-gray-700">Outlet Type</label>
+                <select id="Outlet_Type" name="Outlet_Type" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" required>
+                    <option value="" disabled selected>Select Outlet Type</option>
+                    <option value="Supermarket Type1">Supermarket Type1</option>
+                    <option value="Supermarket Type2">Supermarket Type2</option>
+                    <option value="Supermarket Type3">Supermarket Type3</option>
+                    <option value="Grocery Store">Grocery Store</option>
+                </select>
+            </div>
+
+
+            <!-- Submit Button -->
+            <div class="col-span-full pt-4">
+                <button type="submit" class="w-full py-3 px-4 bg-indigo-600 text-white font-bold rounded-lg shadow-lg hover:bg-indigo-700 transition duration-300 transform hover:scale-105">
+                    Predict Sales
+                </button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
